@@ -26,13 +26,6 @@ public class Character {
         return this.legsInside;
     }
 
-    public int GetHeight() {
-        return this.height;
-    }
-    public int GetWidth() {
-        return this.width;
-    }
-
     public void PrintResult() {
         System.out.println(finalMessage);
     }
