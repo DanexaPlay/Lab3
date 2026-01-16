@@ -1,25 +1,28 @@
 package main.house;
 
-abstract public class HouseParts {
+import main.HasSizes;
+
+abstract public class HouseParts implements HasSizes {
     protected int height, width, endurance; //Endurance - from 0 to 100
     protected boolean isBroken;
 
     public void BreakFromAction() {
-        if (isBroken == false) {
-            SetIsBroken();
+        if (!isBroken) {
+            setIsBroken();
             endurance = 0;
         }
     }
-    public boolean GetIsBroken() {
+    public boolean getIsBroken() {
         return isBroken;
     }
-    protected void SetIsBroken() {
+    protected void setIsBroken() {
         isBroken = true;
     }
-    public int GetHeight() {
+
+    public int getHeight() {
         return this.height;
     }
-    public int GetWidth() {
+    public int getWidth() {
         return this.width;
     }
 }
