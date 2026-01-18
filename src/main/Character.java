@@ -1,305 +1,226 @@
 package main;
 
-import main.house.Entrance;
-import main.house.Floor;
-import main.house.Roof;
-import main.house.Walls;
+import main.house.*;
+import main.weather.WeatherConditions;
 
-public class Character {
-    private int age, height, width;
-    private float clumsiness;
-    private String name, pose, finalMessage = "";
+import java.util.Objects;
+
+public class Character implements HasSizes {
+    private int height, width;
+    private final int age;
+    private final String name;
+    private String finalMessage = "";
+    private Poses pose;
     private boolean legsInside, weatherAffect, enteredHouse;
-    private final static String[] poseList = {"На ногах", "На четвереньках", "Лёжа", "На боку"};
 
-    public void SetWeatherAffection(boolean arg) {
+    public void setWeatherAffection(boolean arg) {
         this.weatherAffect = arg;
     }
-    public boolean GetWeatherAffection() {
+
+    public boolean getWeatherAffection() {
         return this.weatherAffect;
     }
 
-    public void SetLegsInside(boolean arg) {
+    public void setLegsInside(boolean arg) {
         this.legsInside = arg;
     }
-    public boolean GetLegsInside() {
+
+    public boolean getLegsInside() {
         return this.legsInside;
     }
 
-    public int GetHeight() {
-        return this.height;
-    }
-    public int GetWidth() {
-        return this.width;
-    }
-
-    public void PrintResult() {
+    public void printResult() {
         System.out.println(finalMessage);
     }
 
-    public void SetSize(int height, int width) {
+    public void extendResult(String arg) {
+        finalMessage += arg;
+    }
+
+    public void setSize(int height, int width) {
         this.height = height;
         this.width = width;
     }
 
-    public void SetClumsiness(float clumsiness) {
-        if (clumsiness <= 1.0 && clumsiness >= 0.0) {
-            this.clumsiness = clumsiness;
-            if (this.clumsiness >= 0.5) {
-                finalMessage += "и неуклюж. Надо быть поосторожнее - сказал " + name + ". ";
-            }
-            else {
-                finalMessage += "и аккуратен. - сказал " + name + ". ";
-            }
-        }
-        else {
-            System.out.println("Неверно введён параметр неуклюжести!");
-            System.exit(1);
-        }
+    public int getHeight() {
+        return height;
     }
 
-    public void SetPose(String pose) {
-        for (String i : poseList) {
-            if (pose.equals(i)) {
-                this.pose = pose;
-                break;
-            }
-        }
-        if (!this.pose.equals(pose)) {
-            System.out.println("Введена несуществующая поза!");
-            System.exit(1);
-        }
+    public int getWidth() {
+        return width;
     }
 
-    private boolean AnalyseEntrance(Entrance e1, String pose) {
-        if (pose.equals("На ногах")) {
-            if (height > e1.GetHeight() || width > e1.GetWidth()) {
-                System.out.println("Вход слишком мал, чтобы войти как обычно");
-                return false;
-            }
-        }
-        if (pose.equals("На четвереньках")) {
-            if (height / 4 > e1.GetHeight() || width > e1.GetWidth()) {
-                System.out.println("Вход слишком мал, чтобы войти на четвереньках");
-                return false;
-            }
-        }
-        if (pose.equals("Лёжа")) {
-            if (height / 10 > e1.GetHeight() || width > e1.GetWidth()) {
-                System.out.println("Вход слишком мал, чтобы проползти");
-                return false;
-            }
-        }
-        return true;
+    public Poses getPose() {
+        return pose;
     }
 
-    public boolean AnalyseRoof(Walls w1, Roof r1, String pose) {
-        if (pose.equals("На ногах")) {
-            if (w1.GetHeight() <= height) {
-                return false;
-            }
-            return true;
-        }
-        else if (pose.equals("На четвереньках")) {
-            if (height / 4 > w1.GetHeight()) {
-                return false;
-            }
-            return true;
-        }
-        else if (pose.equals("Лёжа")) {
-            if (height / 10 > w1.GetHeight()) {
-                return false;
-            }
-            return true;
-        }
-        else if (pose.equals("На боку")) {
-            if (width > w1.GetHeight()) {
-                return false;
-            }
-            return true;
-        }
-        else {
-            System.out.println("Поза не найдена!");
-            System.exit(1);
-            return false;
-        }
+    public void setPose(Poses pose) {
+        this.pose = pose;
     }
 
-    public boolean AnalyseWalls(Walls w1, Roof r1, String pose) {
-        if (pose.equals("На ногах")) {
-            if (width >= w1.GetWidth() / 2 || height >= w1.GetHeight() / 2) {
-                return false;
-            }
-            return true;
-        }
-        else if (pose.equals("На четвереньках")) {
-            if (width >= w1.GetWidth() / 2 || height / 4 >= w1.GetHeight() / 2) {
-                return false;
-            }
-            if (height > r1.GetHeight() || width > r1.GetWidth()) {
-                return false;
-            }
-            return true;
-        }
-        else if (pose.equals("Лёжа")) {
-            if (width >= w1.GetWidth() / 2 || height / 10 >= w1.GetHeight() / 2) {
-                    return false;
-                }
-                if (height > r1.GetHeight() || width > r1.GetWidth()) {
-                    return false;
-                }
-                return true;
-            }
-            else if (pose.equals("На боку")) {
-                if (height > r1.GetHeight()) {
-                    return false;
-                }
-                return true;
-            }
-        else {
-            System.out.println("Поза не найдена!");
-            System.exit(1);
-            return false;
-        }
-    }
-
-    public void AnalysePoses(Walls w1, Roof r1) {
-        if (!AnalyseRoof(w1, r1, "На ногах")) {
+    public void analysePoses(House.Walls w1, House.Floor.Roof r1) {
+        if (!r1.analyse(w1, this, Poses.ONLEGS)) {
             finalMessage += "Нельзя встать без того, чтобы не пробить головой крышу. ";
         }
-        if (!AnalyseWalls(w1, r1, "Лёжа")) {
+        if (!w1.analyse(r1, this, Poses.LYING)) {
             finalMessage += "Нельзя растянуться па полу, потому что пол слишком короток. ";
         }
-        if (!AnalyseRoof(w1, r1, "На боку")) {
+        if (r1.analyse(w1, this, Poses.ONSIDE)) {
             finalMessage += "Нельзя повернуться на бок из-за тесноты. ";
         }
     }
 
-    public void AnalyseWeather(Weather w1) {
+    public void analyseWeather(WeatherConditions w1) {
         if (!legsInside) {
             finalMessage += "Но главное, как быть с ногами? ";
-            if (w1.GetCanAffect()) {
-                finalMessage += "Если ты залез в домик, то надо втянуть внутрь и ноги, а то они, чего доброго, попадут под " + w1.GetName();
+            if (w1.anyWeatherAffects()) {
+                w1.addWeatherAffectMessages(this);
             }
         }
     }
 
-    public void EnterHouse(Entrance e1, Walls w1, Roof r1, Floor f1) {
-        if (f1.GetHeight() == r1.GetHeight() && f1.GetWidth() == r1.GetWidth() && e1.GetHeight() <= w1.GetHeight() && e1.GetWidth() <= f1.GetWidth()) {
-            if (pose.equals("На ногах")) {
-                finalMessage += "Он вошёл в дом обычным способом. ";
-                SetLegsInside(true);
-                enteredHouse = true;
+    public void enterHouse(House.Entrance e1, House.Walls w1, House.Floor.Roof r1, House.Floor f1) throws IllegalArgumentException {
+        if (f1.getHeight() == r1.getHeight() && f1.getWidth() == r1.getWidth() && e1.getHeight() <= w1.getHeight() && e1.getWidth() <= f1.getWidth()) {
+            switch (pose) {
+                case Poses.ONLEGS:
+                    finalMessage += "Он вошёл в дом обычным способом. ";
+                    setLegsInside(true);
+                    enteredHouse = true;
+                    break;
+                case Poses.ONALLFOURS:
+                    finalMessage += "Он стал на колени перед входом и, вздыхая, вполз внутрь на четвереньках. ";
+                    enteredHouse = true;
+                    break;
+                case Poses.LYING:
+                    finalMessage += "Он пробрался в дом ползком. ";
+                    enteredHouse = true;
+                    break;
+                default:
+                    System.out.println("Поза задана неверно!");
+                    enteredHouse = false;
+                    break;
             }
-            else if (pose.equals("На четвереньках")) {
-                finalMessage += "Он стал на колени перед входом и, вздыхая, вполз внутрь на четвереньках. ";
-                enteredHouse = true;
-            }
-            else if (pose.equals("Лёжа")) {
-                finalMessage += "Он пробрался в дом ползком. ";
-                enteredHouse = true;
-            }
-            else {
-                System.out.println("Поза задана неверно!");
-                enteredHouse = false;
-                System.exit(1);
-            }
-            if (!AnalyseRoof(w1, r1, pose)) {
+            if (!r1.analyse(w1, this, pose)) {
                 r1.BreakFromAction();
-                SetWeatherAffection(true);
+                setWeatherAffection(true);
                 finalMessage += "Входя в дом, он сломал крышу. ";
             }
-            if (!AnalyseWalls(w1, r1, pose)) {
+            if (!w1.analyse(r1, this, pose)) {
                 w1.BreakFromAction();
-                SetLegsInside(false);
-                SetWeatherAffection(true);
+                setLegsInside(false);
+                setWeatherAffection(true);
                 finalMessage += "Входя в дом, он сломал стены. ";
             }
-            if (!AnalyseEntrance(e1, pose)) {
+            if (!e1.analyse(this)) {
                 e1.BreakFromAction();
                 finalMessage += "Входя в дом, он сломал дверь. ";
             }
-        }
-        else {
-            System.out.println("Неверно заданы параметры дома!");
-            System.exit(1);
+        } else {
+            throw new IllegalArgumentException("Неверно заданы параметры дома!");
         }
     }
 
-    public void LayOnFloor(Floor f1, Walls w1, Roof r1) {
-        if (pose.equals("Лёжа") || !enteredHouse) {
-            System.out.println("Персонаж уже лежит или не находится в домике");
-        }
-        else {
-            SetPose("Лёжа");
-            if (!AnalyseWalls(w1, r1, pose)) {
+    public void layOnFloor(House.Floor f1, House.Walls w1, House.Floor.Roof r1) throws InvalidPoseException {
+        if (pose == Poses.LYING || !enteredHouse) {
+            throw new InvalidPoseException("Персонаж уже лежит или не находится в домике");
+        } else {
+            setPose(Poses.LYING);
+            if (!w1.analyse(r1, this, pose)) {
                 w1.BreakFromAction();
                 finalMessage += "Ложась на пол, он сломал стены. ";
-                SetLegsInside(false);
-                SetWeatherAffection(true);
-            }
-            else {
-                SetLegsInside(true);
+                setLegsInside(false);
+                setWeatherAffection(true);
+            } else {
+                setLegsInside(true);
             }
         }
     }
 
-    public void StandUp(Roof r1, Floor f1, Walls w1) {
-        if (!pose.equals("На ногах") && enteredHouse) {
-            SetPose("На ногах");
-            SetLegsInside(true);
-            if (!AnalyseRoof(w1, r1, pose)) {
+    public void standUp(House.Floor.Roof r1, House.Floor f1, House.Walls w1) throws InvalidPoseException {
+        if (pose != Poses.ONLEGS && enteredHouse) {
+            setPose(Poses.ONLEGS);
+            setLegsInside(true);
+            if (!r1.analyse(w1, this, pose)) {
                 r1.BreakFromAction();
                 finalMessage += "Поднимаясь, он сломал крышу. ";
-                SetWeatherAffection(true);
+                setWeatherAffection(true);
             }
-        }
-        else {
-            System.out.println("Персонаж уже стоит или не находится в домике");
+        } else {
+            throw new InvalidPoseException("Персонаж уже стоит или не находится в домике");
         }
     }
 
-    public void TurnOnSide(Roof r1, Floor f1, Walls w1) {
-        if (!pose.equals("На боку") && enteredHouse) {
-            SetPose("На боку");
-            if (!AnalyseWalls(w1, r1, pose)) {
+    public void turnOnSide(House.Floor.Roof r1, House.Floor f1, House.Walls w1) throws InvalidPoseException {
+        if (pose != Poses.ONSIDE && enteredHouse) {
+            setPose(Poses.ONSIDE);
+            if (!w1.analyse(r1, this, pose)) {
                 w1.BreakFromAction();
                 finalMessage += "Поворачиваясь на бок, он сломал стены. ";
-                SetWeatherAffection(true);
-                SetLegsInside(false);
+                setWeatherAffection(true);
+                setLegsInside(false);
+            } else {
+                setLegsInside(true);
             }
-            else {
-                SetLegsInside(true);
-            }
-        }
-        else {
-            System.out.println("Персонаж уже лежит на боку или не находится в домике");
+        } else {
+            throw new InvalidPoseException("Персонаж уже лежит на боку или не находится в домике");
         }
     }
 
-    public void TryPuttingLegsInside(Walls w1, Roof r1) {
-        if (!legsInside && !pose.equals("На ногах")) {
-            if (height * 0.6 <= r1.GetHeight()) {
+    public void tryPuttingLegsInside(House.Walls w1, House.Floor.Roof r1) {
+        if (!legsInside && pose != Poses.ONLEGS) {
+            if (height * 0.6 <= r1.getHeight()) {
                 legsInside = true;
-            }
-            else {
+            } else {
                 System.out.println(name + " попытался поместить ноги внутрь, но неудачно. ");
             }
         }
     }
 
-    public Character(String name, int age) {
+    public Character(String name, int age) throws IllegalArgumentException {
         this.name = name;
         this.age = age;
         if (age < 0) {
-            System.out.println("Неверно задан возраст!");
-            System.exit(1);
+            throw new IllegalArgumentException("Возраст < 0!");
+        } else if (age >= 40) {
+            finalMessage += "Стар я становлюсь и неуклюж. - Сказал " + name + ". ";
+        } else {
+            finalMessage += "Молод я ещё. " + "Сказал " + name + ". ";
         }
-        if (age >= 35) {
-            finalMessage += "Стар я становлюсь ";
-        }
-        else {
-            finalMessage += "Молод я ещё ";
-        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Character character = (Character) o;
+        return height == character.height &&
+                width == character.width &&
+                age == character.age &&
+                legsInside == character.legsInside &&
+                weatherAffect == character.weatherAffect &&
+                enteredHouse == character.enteredHouse &&
+                Objects.equals(name, character.name) &&
+                Objects.equals(finalMessage, character.finalMessage) &&
+                Objects.equals(pose, character.pose);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(height, width, age, name, finalMessage, pose,
+                legsInside, weatherAffect, enteredHouse);
+    }
+
+    public String toString() {
+        return "Character{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", height=" + height +
+                ", width=" + width +
+                ", finalMessage='" + finalMessage + '\'' +
+                ", pose=" + pose +
+                ", legsInside=" + legsInside +
+                ", weatherAffect=" + weatherAffect +
+                ", enteredHouse=" + enteredHouse +
+                '}';
     }
 }
