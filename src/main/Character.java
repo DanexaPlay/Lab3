@@ -3,7 +3,9 @@ package main;
 import main.house.*;
 import main.weather.WeatherConditions;
 
-public class Character implements HasSizes{
+import java.util.Objects;
+
+public class Character implements HasSizes {
     private int height, width;
     private final int age;
     private final String name;
@@ -14,6 +16,7 @@ public class Character implements HasSizes{
     public void setWeatherAffection(boolean arg) {
         this.weatherAffect = arg;
     }
+
     public boolean getWeatherAffection() {
         return this.weatherAffect;
     }
@@ -21,6 +24,7 @@ public class Character implements HasSizes{
     public void setLegsInside(boolean arg) {
         this.legsInside = arg;
     }
+
     public boolean getLegsInside() {
         return this.legsInside;
     }
@@ -28,7 +32,10 @@ public class Character implements HasSizes{
     public void printResult() {
         System.out.println(finalMessage);
     }
-    public void extendResult(String arg) {finalMessage += arg;}
+
+    public void extendResult(String arg) {
+        finalMessage += arg;
+    }
 
     public void setSize(int height, int width) {
         this.height = height;
@@ -93,23 +100,22 @@ public class Character implements HasSizes{
                     enteredHouse = false;
                     break;
             }
-                if (!r1.analyse(w1, this, pose)) {
-                    r1.BreakFromAction();
-                    setWeatherAffection(true);
-                    finalMessage += "Входя в дом, он сломал крышу. ";
-                }
-                if (!w1.analyse(r1, this, pose)) {
-                    w1.BreakFromAction();
-                    setLegsInside(false);
-                    setWeatherAffection(true);
-                    finalMessage += "Входя в дом, он сломал стены. ";
-                }
-                if (!e1.analyse(this)) {
-                    e1.BreakFromAction();
-                    finalMessage += "Входя в дом, он сломал дверь. ";
-                }
+            if (!r1.analyse(w1, this, pose)) {
+                r1.BreakFromAction();
+                setWeatherAffection(true);
+                finalMessage += "Входя в дом, он сломал крышу. ";
             }
-        else {
+            if (!w1.analyse(r1, this, pose)) {
+                w1.BreakFromAction();
+                setLegsInside(false);
+                setWeatherAffection(true);
+                finalMessage += "Входя в дом, он сломал стены. ";
+            }
+            if (!e1.analyse(this)) {
+                e1.BreakFromAction();
+                finalMessage += "Входя в дом, он сломал дверь. ";
+            }
+        } else {
             throw new IllegalArgumentException("Неверно заданы параметры дома!");
         }
     }
@@ -117,16 +123,14 @@ public class Character implements HasSizes{
     public void layOnFloor(House.Floor f1, House.Walls w1, House.Floor.Roof r1) {
         if (pose == Poses.LYING || !enteredHouse) {
             System.out.println("Персонаж уже лежит или не находится в домике");
-        }
-        else {
+        } else {
             setPose(Poses.LYING);
             if (!w1.analyse(r1, this, pose)) {
                 w1.BreakFromAction();
                 finalMessage += "Ложась на пол, он сломал стены. ";
                 setLegsInside(false);
                 setWeatherAffection(true);
-            }
-            else {
+            } else {
                 setLegsInside(true);
             }
         }
@@ -141,8 +145,7 @@ public class Character implements HasSizes{
                 finalMessage += "Поднимаясь, он сломал крышу. ";
                 setWeatherAffection(true);
             }
-        }
-        else {
+        } else {
             System.out.println("Персонаж уже стоит или не находится в домике");
         }
     }
@@ -155,12 +158,10 @@ public class Character implements HasSizes{
                 finalMessage += "Поворачиваясь на бок, он сломал стены. ";
                 setWeatherAffection(true);
                 setLegsInside(false);
-            }
-            else {
+            } else {
                 setLegsInside(true);
             }
-        }
-        else {
+        } else {
             System.out.println("Персонаж уже лежит на боку или не находится в домике");
         }
     }
@@ -169,8 +170,7 @@ public class Character implements HasSizes{
         if (!legsInside && pose != Poses.ONLEGS) {
             if (height * 0.6 <= r1.getHeight()) {
                 legsInside = true;
-            }
-            else {
+            } else {
                 System.out.println(name + " попытался поместить ноги внутрь, но неудачно. ");
             }
         }
@@ -181,12 +181,46 @@ public class Character implements HasSizes{
         this.age = age;
         if (age < 0) {
             throw new IllegalArgumentException("Возраст < 0!");
-        }
-        else if (age >= 40) {
+        } else if (age >= 40) {
             finalMessage += "Стар я становлюсь и неуклюж. - Сказал " + name + ". ";
-        }
-        else {
+        } else {
             finalMessage += "Молод я ещё. " + "Сказал " + name + ". ";
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Character character = (Character) o;
+        return height == character.height &&
+                width == character.width &&
+                age == character.age &&
+                legsInside == character.legsInside &&
+                weatherAffect == character.weatherAffect &&
+                enteredHouse == character.enteredHouse &&
+                Objects.equals(name, character.name) &&
+                Objects.equals(finalMessage, character.finalMessage) &&
+                Objects.equals(pose, character.pose);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(height, width, age, name, finalMessage, pose,
+                legsInside, weatherAffect, enteredHouse);
+    }
+
+    public String toString() {
+        return "Character{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                ", height=" + height +
+                ", width=" + width +
+                ", finalMessage='" + finalMessage + '\'' +
+                ", pose=" + pose +
+                ", legsInside=" + legsInside +
+                ", weatherAffect=" + weatherAffect +
+                ", enteredHouse=" + enteredHouse +
+                '}';
     }
 }

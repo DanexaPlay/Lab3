@@ -8,7 +8,6 @@ public class House {
         public Entrance(int height, int width) {
             this.height = height;   //Shouldn't be more than walls height
             this.width = width; //Shouldn't be more than floor and roof width
-            this.endurance = 100;
         }
         //Isn't related with weather affection
         public boolean analyse(Character c1) throws IllegalStateException {
@@ -43,7 +42,6 @@ public class House {
         public Walls(int height) {
             this.height = height;
             this.width = 1; //Because doesn't matter for walls
-            this.endurance = 100;
         }
 
         public boolean analyse(Floor.Roof r1, Character c1, Poses pose) {
@@ -71,7 +69,6 @@ public class House {
         public Floor(int height, int width) {
             this.height = height;   //In this case - length of the floor, should be the same as roof length
             this.width = width;     //Should be the same as roof width
-            this.endurance = 100;
         }
         //Isn't related with weather affection
 
@@ -79,7 +76,6 @@ public class House {
             public Roof(int height, int width) {
                 this.height = height;   //In this case - length of the roof, should be the same as floor length
                 this.width = width;     //Should be the same as floor width
-                this.endurance = 100;
             }
 
             public boolean analyse(Walls w1, Character c1, Poses pose) {
