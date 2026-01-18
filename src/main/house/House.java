@@ -12,28 +12,30 @@ public class House {
         }
         //Isn't related with weather affection
         public boolean analyse(Character c1) throws IllegalStateException {
-            switch (c1.getPose()) {
-                case Poses.ONLEGS:
+            return switch (c1.getPose()) {
+                case Poses.ONLEGS -> {
                     if (c1.getHeight() > height || c1.getWidth() > width) {
                         System.out.println("Вход слишком мал, чтобы войти как обычно");
-                        return false;
+                        yield false;
                     }
-                    return true;
-                case Poses.ONALLFOURS:
+                    yield true;
+                }
+                case Poses.ONALLFOURS -> {
                     if (c1.getHeight() / 4 > height || c1.getWidth() > width) {
                         System.out.println("Вход слишком мал, чтобы войти на четвереньках");
-                        return false;
+                        yield false;
                     }
-                    return true;
-                case Poses.LYING:
+                    yield true;
+                }
+                case Poses.LYING -> {
                     if (c1.getHeight() / 10 > height || c1.getWidth() > width) {
                         System.out.println("Вход слишком мал, чтобы проползти");
-                        return false;
+                        yield false;
                     }
-                    return true;
-                default:
-                    throw new IllegalStateException("Поза не найдена!");
-            }
+                    yield true;
+                }
+                default -> throw new IllegalStateException("Поза не найдена!");
+            };
         }
     }
 
@@ -45,36 +47,23 @@ public class House {
         }
 
         public boolean analyse(Floor.Roof r1, Character c1, Poses pose) {
-            switch (pose) {
-                case Poses.ONLEGS:
-                    if (c1.getWidth() >= r1.getWidth() / 2 || c1.getHeight() >= height / 2) {
-                        return false;
-                    }
-                    return true;
-                case Poses.ONALLFOURS:
+            return switch (pose) {
+                case Poses.ONLEGS -> c1.getWidth() < r1.getWidth() / 2 && c1.getHeight() < height / 2;
+                case Poses.ONALLFOURS -> {
                     if (c1.getWidth() >= r1.getWidth() / 2 || c1.getHeight() / 4 >= height / 2) {
-                        return false;
+                        yield false;
                     }
-                    if (height > r1.getHeight() || width > r1.getWidth()) {
-                        return false;
-                    }
-                    return true;
-                case Poses.LYING:
+                    yield height <= r1.getHeight() && width <= r1.getWidth();
+                }
+                case Poses.LYING -> {
                     if (c1.getWidth() >= width / 2 || c1.getHeight() / 10 >= height / 2) {
-                        return false;
+                        yield false;
                     }
-                    if (c1.getHeight() > r1.getHeight() || c1.getWidth() > r1.getWidth()) {
-                        return false;
-                    }
-                    return true;
-                case Poses.ONSIDE:
-                    if (c1.getHeight() > r1.getHeight()) {
-                        return false;
-                    }
-                    return true;
-                default:
-                    throw new IllegalStateException("Поза не найдена!");
-            }
+                    yield c1.getHeight() <= r1.getHeight() && c1.getWidth() <= r1.getWidth();
+                }
+                case Poses.ONSIDE -> c1.getHeight() <= r1.getHeight();
+                default -> throw new IllegalStateException("Поза не найдена!");
+            };
         }
     }
 
@@ -94,30 +83,13 @@ public class House {
             }
 
             public boolean analyse(Walls w1, Character c1, Poses pose) {
-                switch (pose) {
-                    case Poses.ONLEGS:
-                        if (w1.getHeight() <= c1.getHeight()) {
-                            return false;
-                        }
-                        return true;
-                    case Poses.ONALLFOURS :
-                        if (c1.getHeight() / 4 > w1.getHeight()) {
-                            return false;
-                        }
-                        return true;
-                    case Poses.LYING:
-                        if (c1.getHeight() / 10 > w1.getHeight()) {
-                            return false;
-                        }
-                        return true;
-                    case Poses.ONSIDE:
-                        if (c1.getWidth() > w1.getHeight()) {
-                            return false;
-                        }
-                        return true;
-                    default:
-                        throw new IllegalStateException("Поза не найдена!");
-                    }
+                return switch (pose) {
+                    case Poses.ONLEGS -> w1.getHeight() > c1.getHeight();
+                    case Poses.ONALLFOURS -> c1.getHeight() / 4 <= w1.getHeight();
+                    case Poses.LYING -> c1.getHeight() / 10 <= w1.getHeight();
+                    case Poses.ONSIDE -> c1.getWidth() <= w1.getHeight();
+                    default -> throw new IllegalStateException("Поза не найдена!");
+                };
                 }
             }
     }

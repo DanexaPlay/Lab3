@@ -21,9 +21,14 @@ public class WeatherConditions {
     }
 
     public void addWeatherAffectMessages(Character c1) {
+        boolean flag = false;
         for (Weather i : weatherConditions) {
             if (i.canAffect()) {
                 c1.extendResult(i.name() + ",");
+                flag = true;
+            }
+            if (flag) {
+                c1.extendResult("- погода на улице");
             }
         }
     }

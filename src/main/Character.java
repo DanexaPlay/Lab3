@@ -183,10 +183,10 @@ public class Character implements HasSizes{
             throw new IllegalArgumentException("Возраст < 0!");
         }
         else if (age >= 40) {
-            finalMessage += "Стар я становлюсь и неуклюж";
+            finalMessage += "Стар я становлюсь и неуклюж. - Сказал " + name + ". ";
         }
         else {
-            finalMessage += "Молод я ещё. ";
+            finalMessage += "Молод я ещё. " + "Сказал " + name + ". ";
         }
     }
 }
