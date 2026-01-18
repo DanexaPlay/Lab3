@@ -120,9 +120,9 @@ public class Character implements HasSizes {
         }
     }
 
-    public void layOnFloor(House.Floor f1, House.Walls w1, House.Floor.Roof r1) {
+    public void layOnFloor(House.Floor f1, House.Walls w1, House.Floor.Roof r1) throws InvalidPoseException {
         if (pose == Poses.LYING || !enteredHouse) {
-            System.out.println("Персонаж уже лежит или не находится в домике");
+            throw new InvalidPoseException("Персонаж уже лежит или не находится в домике");
         } else {
             setPose(Poses.LYING);
             if (!w1.analyse(r1, this, pose)) {
@@ -136,7 +136,7 @@ public class Character implements HasSizes {
         }
     }
 
-    public void standUp(House.Floor.Roof r1, House.Floor f1, House.Walls w1) {
+    public void standUp(House.Floor.Roof r1, House.Floor f1, House.Walls w1) throws InvalidPoseException {
         if (pose != Poses.ONLEGS && enteredHouse) {
             setPose(Poses.ONLEGS);
             setLegsInside(true);
@@ -146,11 +146,11 @@ public class Character implements HasSizes {
                 setWeatherAffection(true);
             }
         } else {
-            System.out.println("Персонаж уже стоит или не находится в домике");
+            throw new InvalidPoseException("Персонаж уже стоит или не находится в домике");
         }
     }
 
-    public void turnOnSide(House.Floor.Roof r1, House.Floor f1, House.Walls w1) {
+    public void turnOnSide(House.Floor.Roof r1, House.Floor f1, House.Walls w1) throws InvalidPoseException {
         if (pose != Poses.ONSIDE && enteredHouse) {
             setPose(Poses.ONSIDE);
             if (!w1.analyse(r1, this, pose)) {
@@ -162,7 +162,7 @@ public class Character implements HasSizes {
                 setLegsInside(true);
             }
         } else {
-            System.out.println("Персонаж уже лежит на боку или не находится в домике");
+            throw new InvalidPoseException("Персонаж уже лежит на боку или не находится в домике");
         }
     }
 
